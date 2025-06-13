@@ -9,7 +9,7 @@ import pytest
 from django.core.exceptions import FieldError
 from lamindb.base.users import current_user_id
 from lamindb.errors import InvalidArgument
-from lamindb.models.query_set import DoesNotExist
+from lamindb.errors import DoesNotExist
 
 
 # please also see the test_curate_df.py tests

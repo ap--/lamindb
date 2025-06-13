@@ -1,6 +1,5 @@
 import lamindb as ln
 import pytest
-from lamindb.models.save import prepare_error_message, store_artifacts
 
 
 def test_bulk_save_and_update():
@@ -17,6 +16,8 @@ def test_bulk_save_and_update():
 
 
 def test_prepare_error_message():
+    from lamindb.models.save import prepare_error_message
+
     ln.core.datasets.file_mini_csv()
     artifact = ln.Artifact("mini.csv", description="test")
     exception = Exception("exception")
@@ -39,6 +40,8 @@ def test_save_data_object():
 
 
 def test_store_artifacts_acid():
+    from lamindb.models.save import store_artifacts
+
     ln.core.datasets.file_mini_csv()
     artifact = ln.Artifact("mini.csv", description="test")
     artifact._clear_storagekey = "test.csv"

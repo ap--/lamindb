@@ -37,13 +37,6 @@ from lamindb.errors import (
     FieldValidationError,
     InvalidArgument,
 )
-from lamindb.models.artifact import (
-    check_path_is_child_of_root,
-    data_is_scversedatastructure,
-    data_is_soma_experiment,
-    get_relative_path_to_directory,
-    process_data,
-)
 from lamindb_setup.core.upath import (
     CloudPath,
     LocalPathClasses,
@@ -51,13 +44,39 @@ from lamindb_setup.core.upath import (
     extract_suffix_from_path,
 )
 
+
+# fixme: this should not be in lamindb.models ... =====================
+def data_is_scversedatastructure(*args, **kwargs):
+    from lamindb.models.artifact import data_is_scversedatastructure
+
+    return data_is_scversedatastructure(*args, **kwargs)
+
+
+def data_is_soma_experiment(*args, **kwargs):
+    from lamindb.models.artifact import data_is_soma_experiment
+
+    return data_is_soma_experiment(*args, **kwargs)
+# /fixme ==============================================================
+
+
+
 # how do we properly abstract out the default storage variable?
 # currently, we're only mocking it through `default_storage` as
 # set in conftest.py
 
-ln.settings.verbosity = "success"
-bt.settings.organism = "human"
-
+# FIXME: this sets global settings within some module of the test-suite during import time
+# ln.settings.verbosity = "success"
+# bt.settings.organism = "human"
+@pytest.fixture(scope="module", autouse=True)
+def set_verbosity_and_organism():
+    """Set verbosity and organism for the test module."""
+    org_verbosity, ln.settings.verbosity = ln.settings.verbosity, "success"
+    org_organism, bt.settings.organism = bt.settings.organism, "human"
+    try:
+        yield
+    finally:
+        ln.settings.verbosity = org_verbosity
+        bt.settings.organism = org_organism
 
 @pytest.fixture(scope="module")
 def df():
@@ -540,6 +559,8 @@ def test_create_from_local_filepath(
         )
         return None
     elif key is not None and is_in_registered_storage:
+        from lamindb.models.artifact import get_relative_path_to_directory
+
         inferred_key = get_relative_path_to_directory(
             path=test_filepath, directory=root_dir
         ).as_posix()
@@ -700,6 +721,8 @@ def test_storage_root_upath_equivalence():
 
 
 def test_get_relative_path_to_directory():
+    from lamindb.models.artifact import get_relative_path_to_directory
+
     # upath on S3
     upath_root = UPath("s3://lamindb-ci")
     upath_directory1 = UPath("s3://lamindb-ci/test-data")  # no trailing slash
@@ -730,6 +753,7 @@ def test_get_relative_path_to_directory():
 
 
 def test_check_path_is_child_of_root():
+    from lamindb.core.artifact import check_path_is_child_of_root
     # str
     root = "s3://lamindb-ci"
     upath = "s3://lamindb-ci/test-data/test.csv"
@@ -789,6 +813,8 @@ def test_check_path_is_child_of_root():
 
 
 def test_serialize_paths():
+    from lamindb.models.artifact import process_data
+
     fp_str = ln.core.datasets.anndata_file_pbmc68k_test().as_posix()
     fp_path = Path(fp_str)
 

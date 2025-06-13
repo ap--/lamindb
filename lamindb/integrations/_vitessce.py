@@ -7,10 +7,10 @@ from typing import TYPE_CHECKING
 import lamindb_setup as ln_setup
 from lamin_utils import logger
 
-from lamindb.models.artifact import Artifact
-from lamindb.models.collection import Collection
-from lamindb.models.run import Run
-from lamindb.models.transform import Transform
+from lamindb import Artifact
+from lamindb import Collection
+from lamindb import Run
+from lamindb import Transform
 
 if TYPE_CHECKING:
     from vitessce import VitessceConfig

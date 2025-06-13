@@ -1,5 +1,4 @@
 import lamindb as ln
-from lamindb.models.has_parents import _add_emoji
 
 
 def test_view_parents():
@@ -31,6 +30,8 @@ def test_query_parents_children():
 
 
 def test_add_emoji():
+    from lamindb.models.has_parents import _add_emoji
+
     transform = ln.Transform(key="test-12345", type="upload")
     assert _add_emoji(transform, label="transform") == "🖥️ transform"
     transform.save()

@@ -5,20 +5,20 @@ import pandas as pd
 import pytest
 
 
-@ln.tracked()
-def process_chunk(chunk_id: int) -> str:
-    # Create a simple DataFrame
-    df = pd.DataFrame(
-        {"id": range(chunk_id * 10, (chunk_id + 1) * 10), "value": range(10)}
-    )
-
-    # Save it as an artifact
-    key = f"chunk_{chunk_id}.parquet"
-    artifact = ln.Artifact.from_df(df, key=key).save()
-    return artifact.key
-
-
 def test_tracked_parallel():
+
+    @ln.tracked()
+    def process_chunk(chunk_id: int) -> str:
+        # Create a simple DataFrame
+        df = pd.DataFrame(
+            {"id": range(chunk_id * 10, (chunk_id + 1) * 10), "value": range(10)}
+        )
+
+        # Save it as an artifact
+        key = f"chunk_{chunk_id}.parquet"
+        artifact = ln.Artifact.from_df(df, key=key).save()
+        return artifact.key
+
     param_type = ln.Feature(name="Script[test_tracked.py]", is_type=True).save()
     ln.Feature(name="chunk_id", dtype="int", type=param_type).save()
 

@@ -19,17 +19,13 @@ from lamindb_setup.core.hashing import hash_file
 
 from lamindb.base import ids
 from lamindb.base.ids import base62_12
-from lamindb.models import Run, Transform, format_field_value
+from lamindb import Run, Transform  # fixme: this import should move closer to lamindb.models
 
 from ..core._settings import settings
 from ..errors import (
     InvalidArgument,
     TrackNotCalled,
     UpdateContext,
-)
-from ..models._is_versioned import bump_version as bump_version_function
-from ..models._is_versioned import (
-    increment_base62,
 )
 from ._sync_git import get_transform_reference_from_git_repo
 from ._track_environment import track_environment
@@ -43,6 +39,24 @@ if TYPE_CHECKING:
 is_run_from_ipython = getattr(builtins, "__IPYTHON__", False)
 
 msg_path_failed = "failed to infer notebook path.\nfix: pass `path` to `ln.track()`"
+
+
+# fixme: this should not be in lamindb.models ... =====================
+def format_field_value(*args, **kwargs):
+    from lamindb.models.sqlrecord import format_field_value
+
+    return format_field_value(*args, **kwargs)
+
+def bump_version_function(*args, **kwargs):
+    from lamindb.models._is_versioned import bump_version as bump_version_function
+
+    return bump_version_function(*args, **kwargs)
+
+def increment_base62(*args, **kwargs):
+    from lamindb.models._is_versioned import increment_base62
+
+    return increment_base62(*args, **kwargs)
+# /fixme ==============================================================
 
 
 def get_uid_ext(version: str) -> str:

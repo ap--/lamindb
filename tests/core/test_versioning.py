@@ -2,11 +2,6 @@ import lamindb as ln
 import pandas as pd
 import pytest
 from lamindb import UPath
-from lamindb.models._is_versioned import (
-    bump_version,
-    get_new_path_from_uid,
-    set_version,
-)
 
 
 @pytest.fixture(scope="module")
@@ -20,6 +15,8 @@ def df2():
 
 
 def test_set_version():
+    from lamindb.models._is_versioned import set_version
+
     # all remaining lines are covered in notebooks
     with pytest.raises(ValueError):
         set_version(None, "weird-version")
@@ -31,6 +28,8 @@ def test_set_version():
 
 
 def test_bump_version():
+    from lamindb.models._is_versioned import bump_version
+
     current_version_major_only = "2"
     current_version_major_minor = "2.1"
     weird_version = "weird-version"
@@ -66,6 +65,8 @@ def test__add_to_version_family(df1, df2):
 
 
 def test_get_new_path_from_uid():
+    from lamindb.models._is_versioned import get_new_path_from_uid
+
     # test cloud path as it has different behavior than local path
     with open("test_new_path.txt", "w") as f:
         f.write("test_new_path")

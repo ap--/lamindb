@@ -6,12 +6,6 @@ import bionty as bt
 import lamindb as ln
 import pytest
 from lamindb.errors import FieldValidationError
-from lamindb.models.sqlrecord import (
-    _get_record_kwargs,
-    _search,
-    get_name_field,
-    suggest_records_with_similar_names,
-)
 
 
 def test_validate_literal_fields():
@@ -116,6 +110,9 @@ def test_search_and_get(get_search_test_filepaths):
 
 
 def test_suggest_similar_names():
+    from lamindb.models.sqlrecord import _search
+    from lamindb.models.sqlrecord import suggest_records_with_similar_names
+
     ulabel1 = ln.ULabel(name="Test experiment 1").save()
     ulabel2 = ln.ULabel(name="Test experiment 2").save()
     ulabel3 = ln.ULabel(name="Special test experiment abc").save()
@@ -168,6 +165,8 @@ def test_pass_version():
 
 
 def test_get_name_field():
+    from lamindb.models.sqlrecord import get_name_field
+
     transform = ln.Transform(key="test").save()
     assert get_name_field(ln.Run(transform)) == "started_at"
     with pytest.raises(ValueError):
@@ -206,6 +205,8 @@ def test_using():
 
 
 def test_get_record_kwargs():
+    from lamindb.models.sqlrecord import _get_record_kwargs
+
     assert _get_record_kwargs(ln.Feature) == [
         ("name", "str"),
         ("dtype", "Dtype | Registry | list[Registry] | FieldAttr"),
@@ -228,6 +229,8 @@ def test_get_record_kwargs():
 
 
 def test_get_record_kwargs_empty():
+    from lamindb.models.sqlrecord import _get_record_kwargs
+
     class EmptySQLRecord:
         pass
 

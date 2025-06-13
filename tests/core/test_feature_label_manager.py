@@ -6,9 +6,6 @@ import lamindb as ln
 import pytest
 from lamindb.core.datasets import small_dataset1
 from lamindb.errors import DoesNotExist, ValidationError
-from lamindb.models._feature_manager import describe_features
-from lamindb.models._label_manager import format_rich_tree
-from lamindb.models.artifact import add_labels
 
 
 @pytest.fixture(scope="module")
@@ -45,6 +42,9 @@ Here is how to create a feature:
 
 # below the test for annotating with feature values
 def test_features_add_remove(adata):
+    from lamindb.models._label_manager import format_rich_tree
+    from lamindb.models._feature_manager import describe_features
+
     artifact = ln.Artifact.from_anndata(adata, description="test").save()
     with pytest.raises(ValidationError) as error:
         artifact.features.add_values({"experiment": "Experiment 1"})
@@ -317,6 +317,8 @@ Here is how to create ulabels for them:
 
 # most underlying logic here is comprehensively tested in test_context
 def test_params_add():
+    from lamindb.models._feature_manager import describe_features
+
     path = Path("mymodel.pt")
     path.touch()
     artifact = ln.Artifact("mymodel.pt", kind="model", description="hello").save()
@@ -437,6 +439,8 @@ def test_labels_add(adata):
 
 
 def test_add_labels_using_anndata(adata):
+    from lamindb.models.artifact import add_labels
+
     organism = bt.Organism.from_source(name="mouse")
     cell_types = [bt.CellType(name=name) for name in adata.obs["cell_type"].unique()]
     ln.save(cell_types)

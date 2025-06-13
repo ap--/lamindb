@@ -26,19 +26,12 @@ from lamin_utils import colors, logger
 from lamindb_setup.core._docs import doc_args
 
 from lamindb.base.types import FieldAttr  # noqa
-from lamindb.models import (
+from lamindb import (
     Artifact,
     Feature,
     Run,
     Schema,
-    SQLRecord,
 )
-from lamindb.models._from_values import _format_values
-from lamindb.models.artifact import (
-    data_is_scversedatastructure,
-    data_is_soma_experiment,
-)
-from lamindb.models.feature import parse_cat_dtype, parse_dtype
 
 from ..errors import InvalidArgument, ValidationError
 
@@ -52,6 +45,39 @@ if TYPE_CHECKING:
 
     from lamindb.core.types import ScverseDataStructures
     from lamindb.models.query_set import SQLRecordList
+    from lamindb.models import SQLRecord
+
+
+# fixme: this should not be in lamindb.models ... =====================
+def _format_values(*args, **kwargs):
+    from lamindb.models._from_values import _format_values
+
+    return _format_values(*args, **kwargs)
+
+
+def data_is_scversedatastructure(*args, **kwargs):
+    from lamindb.models.artifact import data_is_scversedatastructure
+
+    return data_is_scversedatastructure(*args, **kwargs)
+
+
+def data_is_soma_experiment(*args, **kwargs):
+    from lamindb.models.artifact import data_is_soma_experiment
+
+    return data_is_soma_experiment(*args, **kwargs)
+
+
+def parse_cat_dtype(*args, **kwargs):
+    from lamindb.models.feature import parse_cat_dtype
+
+    return parse_cat_dtype(*args, **kwargs)
+
+
+def parse_dtype(*args, **kwargs):
+    from lamindb.models.feature import parse_dtype
+
+    return parse_dtype(*args, **kwargs)
+# /fixme ==============================================================
 
 
 def strip_ansi_codes(text):
@@ -1362,7 +1388,7 @@ class DataFrameCatManager:
     def __init__(
         self,
         df: pd.DataFrame | Artifact,
-        columns_field: FieldAttr = Feature.name,
+        columns_field: FieldAttr = ...,
         columns_names: Iterable[str] | None = None,
         categoricals: list[Feature] | None = None,
         sources: dict[str, SQLRecord] | None = None,
@@ -1370,6 +1396,9 @@ class DataFrameCatManager:
         slot: str | None = None,
         maximal_set: bool = False,
     ) -> None:
+        if columns_field is Ellipsis:
+            columns_field = Feature.name
+
         self._non_validated = None
         self._index = index
         self._artifact: Artifact = None  # pass the dataset as an artifact
@@ -1535,6 +1564,8 @@ class DataFrameCatManager:
 
 def get_current_filter_kwargs(registry: type[SQLRecord], kwargs: dict) -> dict:
     """Make sure the source and organism are saved in the same database as the registry."""
+    from lamindb.models import SQLRecord
+
     db = registry.filter().db
     source = kwargs.get("source")
     organism = kwargs.get("organism")

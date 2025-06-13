@@ -6,7 +6,6 @@ from pathlib import Path
 import lamindb as ln
 import lamindb_setup as ln_setup
 import pytest
-from lamindb._finish import clean_r_notebook_html, get_shortcut
 from lamindb.core._context import LogStreamTracker, context
 from lamindb.errors import TrackNotCalled, ValidationError
 
@@ -294,6 +293,9 @@ def test_track_notebook_or_script_manually(type):
 
 
 def test_clean_r_notebook_html():
+    from lamindb._finish import get_shortcut
+    from lamindb._finish import clean_r_notebook_html
+
     orig_notebook_path = NOTEBOOKS_DIR / "basic-r-notebook.Rmd.html"
     content = orig_notebook_path.read_text()
     orig_notebook_path.write_text(content.replace("SHORTCUT", get_shortcut()))

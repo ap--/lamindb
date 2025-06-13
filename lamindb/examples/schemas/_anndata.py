@@ -1,4 +1,4 @@
-from lamindb.models import Schema
+from lamindb import Schema
 
 
 def anndata_ensembl_gene_ids_and_valid_features_in_obs() -> Schema:

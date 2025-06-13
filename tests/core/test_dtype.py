@@ -3,11 +3,24 @@ import pandas as pd
 import pytest
 from lamindb import ULabel
 from lamindb.errors import ValidationError
-from lamindb.models.feature import parse_dtype, serialize_dtype
 
 # -----------------------------------------------------------------------------
 # serializing dtypes
 # -----------------------------------------------------------------------------
+
+# FIXME: it should be possible to import these helpers ================
+def parse_dtype(*args, **kwargs):
+    from lamindb.models.feature import parse_dtype
+
+    return parse_dtype(*args, **kwargs)
+
+def serialize_dtype(*args, **kwargs):
+    from lamindb.models.feature import serialize_dtype
+
+    return serialize_dtype(*args, **kwargs)
+# /FIXME ==============================================================
+
+
 
 
 def test_seralize_dtypes():

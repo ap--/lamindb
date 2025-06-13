@@ -11,7 +11,6 @@ from lamindb_setup.core import deprecated
 from lamindb_setup.core.upath import UPath
 
 from lamindb.core._compat import is_package_installed
-from lamindb.models.artifact import data_is_scversedatastructure
 
 from ..errors import InvalidArgument
 
@@ -22,21 +21,23 @@ if TYPE_CHECKING:
 
     from lamindb.models import SQLRecord
 from lamindb.base.types import FieldAttr  # noqa
-from lamindb.models import (
+from lamindb import (
     Artifact,
     Feature,
-    SQLRecord,
     Run,
     Schema,
 )
-from lamindb.models.artifact import (
-    add_labels,
-)
-from lamindb.models._from_values import _format_values
 from .core import CatLookup, CatVector
 from ..errors import ValidationError
 import anndata as ad
 
+
+# fixme: this should not be in lamindb.models ... =====================
+def _format_values(*args, **kwargs):
+    from lamindb.models._from_values import _format_values
+
+    return _format_values(*args, **kwargs)
+# /fixme ==============================================================
 
 def _ref_is_name(field: FieldAttr | None) -> bool | None:
     """Check if the reference field is a name field."""
@@ -126,6 +127,8 @@ class CatManager:
         run: Run | None = None,
     ) -> Artifact:
         """{}"""  # noqa: D415
+        from lamindb.models.artifact import data_is_scversedatastructure
+
         # Make sure all labels are saved in the current instance
         if not self._is_validated:
             self.validate()  # returns True or False
@@ -185,12 +188,15 @@ class DataFrameCatManager(CatManager):
     def __init__(
         self,
         df: pd.DataFrame | Artifact,
-        columns_field: FieldAttr = Feature.name,
+        columns_field: FieldAttr = ...,
         columns_names: Iterable[str] | None = None,
         categoricals: dict[str, FieldAttr] | None = None,
         sources: dict[str, SQLRecord] | None = None,
         index: Feature | None = None,
     ) -> None:
+        if columns_field is Ellipsis:
+            columns_field = Feature.name
+
         self._non_validated = None
         self._index = index
         super().__init__(
@@ -326,9 +332,14 @@ class AnnDataCatManager(CatManager):
         data: ad.AnnData | Artifact,
         var_index: FieldAttr | None = None,
         categoricals: dict[str, FieldAttr] | None = None,
-        obs_columns: FieldAttr = Feature.name,
+        obs_columns: FieldAttr = ...,
         sources: dict[str, SQLRecord] | None = None,
     ) -> None:
+        from lamindb.models.artifact import data_is_scversedatastructure
+
+        if obs_columns is Ellipsis:
+            obs_columns = Feature.name
+
         if isinstance(var_index, str):
             raise TypeError(
                 "var_index parameter has to be a field, e.g. Gene.ensembl_gene_id"
@@ -932,9 +943,12 @@ class TiledbsomaCatManager(CatManager):
         experiment_uri: UPathStr | Artifact,
         var_index: dict[str, tuple[str, FieldAttr]],
         categoricals: dict[str, FieldAttr] | None = None,
-        obs_columns: FieldAttr = Feature.name,
+        obs_columns: FieldAttr = ...,
         sources: dict[str, SQLRecord] | None = None,
     ):
+        if obs_columns is Ellipsis:
+            obs_columns = Feature.name
+
         self._obs_fields = categoricals or {}
         self._var_fields = var_index
         self._columns_field = obs_columns
@@ -1249,6 +1263,8 @@ class TiledbsomaCatManager(CatManager):
         Returns:
             A saved artifact record.
         """
+        from lamindb.models.artifact import add_labels
+
         if not self._is_validated:
             self.validate()
             if not self._is_validated:
@@ -1948,9 +1964,11 @@ def from_df(
     cls,
     df: pd.DataFrame,
     categoricals: dict[str, FieldAttr] | None = None,
-    columns: FieldAttr = Feature.name,
+    columns: FieldAttr = ...,
     organism: str | None = None,
 ) -> DataFrameCatManager:
+    if columns is Ellipsis:
+        columns = Feature.name
     if organism is not None:
         logger.warning("organism is ignored, define it on the dtype level")
     return DataFrameCatManager(
@@ -1966,10 +1984,13 @@ def from_anndata(
     data: ad.AnnData | UPathStr,
     var_index: FieldAttr,
     categoricals: dict[str, FieldAttr] | None = None,
-    obs_columns: FieldAttr = Feature.name,
+    obs_columns: FieldAttr = ...,
     organism: str | None = None,
     sources: dict[str, SQLRecord] | None = None,
 ) -> AnnDataCatManager:
+    if obs_columns is Ellipsis:
+        obs_columns = Feature.name
+
     if organism is not None:
         logger.warning("organism is ignored, define it on the dtype level")
     return AnnDataCatManager(
@@ -2006,10 +2027,13 @@ def from_tiledbsoma(
     experiment_uri: UPathStr,
     var_index: dict[str, tuple[str, FieldAttr]],
     categoricals: dict[str, FieldAttr] | None = None,
-    obs_columns: FieldAttr = Feature.name,
+    obs_columns: FieldAttr = ...,
     organism: str | None = None,
     sources: dict[str, SQLRecord] | None = None,
 ) -> TiledbsomaCatManager:
+    if obs_columns is Ellipsis:
+        obs_columns = Feature.name
+
     if organism is not None:
         logger.warning("organism is ignored, define it on the dtype level")
     return TiledbsomaCatManager(

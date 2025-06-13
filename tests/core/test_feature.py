@@ -3,7 +3,6 @@ import lamindb as ln
 import pandas as pd
 import pytest
 from lamindb.errors import ValidationError
-from lamindb.models.feature import serialize_pandas_dtype
 from pandas.api.types import is_string_dtype
 
 
@@ -61,6 +60,8 @@ def test_feature_init():
 
 
 def test_feature_from_df(df):
+    from lamindb.models.feature import serialize_pandas_dtype
+
     if feat1 := ln.Feature.filter(name="feat1").one_or_none() is not None:
         feat1.delete()
     features = ln.Feature.from_df(df.iloc[:, :4]).save()

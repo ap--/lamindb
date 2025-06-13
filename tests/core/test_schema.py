@@ -4,7 +4,6 @@ import pandas as pd
 import pytest
 from django.db.utils import IntegrityError
 from lamindb.errors import FieldValidationError, ValidationError
-from lamindb.models.schema import get_related_name, validate_features
 
 
 @pytest.fixture(scope="module")
@@ -116,11 +115,15 @@ def test_schema_from_df(df):
 
 
 def test_get_related_name():
+    from lamindb.models.schema import get_related_name
+
     with pytest.raises(ValueError):
         get_related_name(ln.Transform)
 
 
 def test_validate_features():
+    from lamindb.models.schema import validate_features
+
     with pytest.raises(ValueError):
         validate_features([])
     with pytest.raises(TypeError):
