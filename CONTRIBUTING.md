@@ -48,7 +48,7 @@ Please add a test for every function added to the package.
 Running tests requires the [Docker daemon][] up, then run at the root of the repository:
 
 ```bash
-pytest --ignore=tests/storage --ignore=tests/permission
+pytest --ignore=tests/storage --ignore=tests/permissions
 ```
 
 in the root of the repository.
